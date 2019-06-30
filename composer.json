@@ -1,0 +1,19 @@
+{
+    "name": "whizsid/outofway",
+    "description": "A Map Matching Library",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "WhizSid",
+            "email": "whizsid@aol.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "WhizSid\\OutOfWay\\":"src/"
+        }
+    }
+}
