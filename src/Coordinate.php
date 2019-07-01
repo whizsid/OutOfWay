@@ -66,4 +66,5 @@ class Coordinate {
         return $this->longitude;
     }
 
+
 }
