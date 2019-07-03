@@ -37,7 +37,7 @@ class OutOfWay
      *
      * @var float
      */
-    protected $error = 1.5;
+    protected $error = OOW_MAX_RELATIVE_ERROR;
 
     /**
      * Earth radius in kilo meters. We are calculating all distances
@@ -45,7 +45,7 @@ class OutOfWay
      *
      * @var integer
      */
-    protected $earthRadius = 6371;
+    protected $earthRadius = OOW_EARTH_AVERAGE_RADIUS ;
 
     /**
      * Setting the vehicle coordinates
@@ -171,7 +171,7 @@ class OutOfWay
      * 
      * @return float Distance between points in [km] (same as earthRadius)
      */
-    protected function calculateDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371) {
+    protected function calculateDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = OOW_EARTH_AVERAGE_RADIUS) {
         // convert from degrees to radians
         $latFrom = deg2rad($latitudeFrom);
         $lonFrom = deg2rad($longitudeFrom);
