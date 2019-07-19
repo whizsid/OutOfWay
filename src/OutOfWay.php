@@ -186,4 +186,53 @@ class OutOfWay
         $angle = atan2(sqrt($a), $b);
         return $angle * $earthRadius;
     }
+    
+    protected function getVehiclePosition($coord1,$coord2,$vehicle){
+    	$x1 = $coord1->getXCoordinate();
+    	$x2 = $coord2->getXCoordinate();
+    	$x3 = $vehicle->getXCoordinate();
+    	
+    	$y1 = $coord1->getYCoordinate();
+    	$y2 = $coord2->getYCoordinate();
+    	$y3 = $vehicle->getYCoordinate();
+    	
+    	$z1 = $coord1->getZCoordinate();
+    	$z2 = $coord2->getZCoordinate();
+    	$z3 = $vehicle->getZCoordinate();
+    	
+    	$coordinate = new Coordinate;
+    	
+    }
+
+    /**
+    * Executing the GPS data
+    *
+    *
+    */
+    public function execute(){
+
+    	$vehicle = $this->vehicleCoordinates;
+    	$actual = $this->actualCoordinates;
+    	$translated=[];
+    	
+    	
+    	foreach($vehicle as $vehicleCoordinate){
+    		$sorted = array_sort($actual, function(Coordinate $actual)use(VehicleCoordinate $vehicle)){
+    			return $this->calculateDistance(
+    				$vehicle->getLatitude(),
+    				$vehicle->getLongitude(),
+    				$actual->getLantitude(),
+    				$actual->getLongitude()
+    			);
+    		});
+    		
+    		$first=$sorted[0];
+    		$second=$sorted[1];
+    		
+    		
+    	}
+    }
 }
+    
+    
+    
