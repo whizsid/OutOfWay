@@ -120,4 +120,20 @@ class Coordinate {
     public function getZCoordinate(){
         return $this->getValueOfN()*(1-pow($this->getValueOfSquareEccentricity(),2))*sin(\deg2rad($this->latitude));
     }
+    
+    /**
+    * Setting position by X,Y,Z coordinates
+    *
+    * @param float $x
+    * @param float $y
+    * @param float $z
+    *
+    * @return void
+    */
+    public function setCoordinates($x,$y,$z){
+    	$this->longitude =rad2deg(atan($y/$x));
+    	
+    	$this->longitude = asin($y*tan(deg2rad($this->latitude))*(1-pow($this->getValueOfSquareEccentricity(),2))/$z);
+    }
 }
+    
