@@ -259,19 +259,27 @@ class OutOfWay
     			+
     			pow($y2-$y1,2)
     		);
+    		
+    	$coordinate->setCoordinates($x,$y,$z);
+    	
+    	return $coordinate;
     	
     }
 
     /**
     * Executing the GPS data
     *
-    *
+    * @return Coordinate[]]
     */
-    public function execute(){
+    public function getMatchedCoordinates(){
+    	
+    	if($this->enableFilteration){
+    		$this->filterCoordinates();
+    	}
 
     	$vehicle = $this->vehicleCoordinates;
     	$actual = $this->actualCoordinates;
-    	$translated=[];
+    	$matched=[];
     	
     	
     	foreach($vehicle as $vehicleCoordinate){
@@ -287,10 +295,14 @@ class OutOfWay
     		$first=$sorted[0];
     		$second=$sorted[1];
     		
-    		
+    		$position = $this->getVehiclePosition($first,$second,$vehicle);
+    		$matched[]= $position
     	}
+    	
+    	return $matched;
     }
 }
+    
     
     
     
