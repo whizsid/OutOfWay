@@ -244,20 +244,20 @@ class OutOfWay
     	
     	
     	foreach($vehicle as $vehicleCoordinate){
-    		$sorted = array_sort($actual, function(Coordinate $actual)use(VehicleCoordinate $vehicle)){
+    		uasort($actual, function(Coordinate $actual)use($vehicleCoordinate){
     			return $this->calculateDistance(
-    				$vehicle->getLatitude(),
-    				$vehicle->getLongitude(),
-    				$actual->getLantitude(),
+    				$vehicleCoordinate->getLatitude(),
+    				$vehicleCoordinate->getLongitude(),
+    				$actual->getLatitude(),
     				$actual->getLongitude()
     			);
-    		});
+            });
+            
+    		$first=$actual[0];
+    		$second=$actual[1];
     		
-    		$first=$sorted[0];
-    		$second=$sorted[1];
-    		
-    		$position = $this->getVehiclePosition($first,$second,$vehicle);
-    		$matched[]= $position
+    		$position = $this->getVehiclePosition($first,$second,$vehicleCoordinate);
+    		$matched[]= $position;
     	}
     	
     	return $matched;
