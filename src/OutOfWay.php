@@ -187,6 +187,17 @@ class OutOfWay
         return $angle * $earthRadius;
     }
     
+    /**
+    * Returning the matched position for twor coordinates and vehicle coordinate
+    *
+    * @link https://www.researchgate.net/publication/48353309_A_General_Map_Matching_Algorithm_for_Transport_Telematics_Applications
+    *
+    * @param Coordinate $coord1
+    * @param Coordinate $coord2
+    * @param VehicleCoordinate $vehicle
+    *
+    * @return Coordinate
+    */
     protected function getVehiclePosition($coord1,$coord2,$vehicle){
     	$x1 = $coord1->getXCoordinate();
     	$x2 = $coord2->getXCoordinate();
