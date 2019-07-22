@@ -52,10 +52,38 @@ file_put_contents('returned.json', $contents);
         margin: 0;
         padding: 0;
       }
+
+      .color {
+        width: 24px;
+        height: 24px;
+        display: inline-block;
+      }
+
+      .red {
+          background:red
+      }
+
+      .green {
+          background:green;
+      }
+
+      .blue {
+          background: blue;
+      }
+
+      #description {
+          position:fixed;
+          bottom:0;
+          left:0;
+          background:white;
+      }
     </style>
   </head>
   <body>
     <div id="map"></div>
+    <div id="description">
+        <span class="color red"></span> Actual Road  <span class="color green"></span> Vehicle Path <span class="color blue" ></span> Calculated Path
+    </div>
     <script>
 
       // This example creates a 2-pixel-wide red polyline showing the path of
