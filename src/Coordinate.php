@@ -2,7 +2,9 @@
 
 namespace WhizSid\OutOfWay;
 
-class Coordinate {
+use JsonSerializable;
+
+class Coordinate implements JsonSerializable {
     /**
      * Latitude of the coordinate
      *
@@ -131,9 +133,18 @@ class Coordinate {
     * @return void
     */
     public function setCoordinates($x,$y,$z){
-    	$this->longitude =rad2deg(atan($y/$x));
-    	
-    	$this->longitude = asin($y*tan(deg2rad($this->latitude))*(1-pow($this->getValueOfSquareEccentricity(),2))/$z);
+        $this->longitude =rad2deg(atan($y/$x));
+        
+        $this->latitude = rad2deg(atan($z*sin(deg2rad($this->longitude))/((1-pow($this->getValueOfSquareEccentricity(),2))*$y)));
+                
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'lat'=>$this->latitude,
+            'lng'=>$this->longitude
+        ];
     }
 }
     

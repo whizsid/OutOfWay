@@ -209,18 +209,18 @@ class OutOfWay
     	
     	$z1 = $coord1->getZCoordinate();
     	$z2 = $coord2->getZCoordinate();
-    	$z3 = $vehicle->getZCoordinate();
-    	
+        $z3 = $vehicle->getZCoordinate();
+        
     	$coordinate = new Coordinate;
     	
         $numerator = ( pow($x2- $x1,2) + pow($y2-$y1,2) );
     	
     	$x= ( ($x2-$x1) * ( $x3*($x2-$x1) + $y3*($y2-$y1) ) + ($y2-$y1) * ($x1*$y2-$x2*$y1) )/ $numerator;
     		
-    	$y = ( ($y2-$y1) * ( $x3*($x2-$x1) + $y3*($y2-$y1) ) + ($x2-$x1) * ($x1*$y2-$x2*$y1) )/ $numerator;
+    	$y = ( ($y2-$y1) * ( $x3*($x2-$x1) + $y3*($y2-$y1) ) - ($x2-$x1) * ($x1*$y2-$x2*$y1) )/ $numerator;
     	
-    	$z= ( ($z2-$z1) * ( $z3*($z2-$z1) + $y3*($y2-$y1) ) + ($y2-$y1) * ($z1*$y2-$z2*$y1) )/ $numerator;
-    		
+    	$z= ( ($z2-$z1) * ( $z3*($z2-$z1) + $y3*($y2-$y1) ) + ($y2-$y1) * ($z1*$y2-$z2*$y1) )/ ( pow($z2- $z1,2) + pow($y2-$y1,2) );
+	
     	$coordinate->setCoordinates($x,$y,$z);
     	
     	return $coordinate;
@@ -256,8 +256,9 @@ class OutOfWay
     		$first=$actual[0];
     		$second=$actual[1];
     		
-    		$position = $this->getVehiclePosition($first,$second,$vehicleCoordinate);
-    		$matched[]= $position;
+            $position = $this->getVehiclePosition($first,$second,$vehicleCoordinate);
+
+            $matched[]= $position;
     	}
     	
     	return $matched;
