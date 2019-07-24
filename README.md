@@ -5,6 +5,7 @@
 
 <p align="center">
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-brightgreen.svg" alt="License: MIT"></a>
+ <a href="https://github.styleci.io/repos/194457139"><img src="https://github.styleci.io/repos/194457139/shield?branch=master" alt="StyleCI"></a>
 </p>
 
 OutOfWay is a map matching library written in PHP. This package will returning matched coordinates when you passed  road coordinates and real coordinates.
