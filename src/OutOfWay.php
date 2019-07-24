@@ -1,27 +1,25 @@
 <?php
-namespace WhizSid\OutOfWay;
 
-use WhizSid\OutOfWay\Coordinate;
-use WhizSid\OutOfWay\VehicleCoordinate;
+namespace WhizSid\OutOfWay;
 
 class OutOfWay
 {
     /**
-     * Helper for the out of way
+     * Helper for the out of way.
      *
      * @var Helper
      */
     public static $helper = Helper::class;
 
     /**
-     * Array of coordinates received from the vehicle
+     * Array of coordinates received from the vehicle.
      *
      * @var VehicleCoordinate[]
      */
     protected $vehicleCoordinates = [];
 
     /**
-     * Actual coordinates received from the source
+     * Actual coordinates received from the source.
      *
      * @var Coordinate[]
      */
@@ -31,7 +29,7 @@ class OutOfWay
      * Weather that enabled filtering the coordinates.
      * We are highly recomendating the filteration. Because
      * If received an error GPS coordinate whole path will
-     * be changing
+     * be changing.
      *
      * @var bool
      */
@@ -47,14 +45,14 @@ class OutOfWay
 
     /**
      * Earth radius in kilo meters. We are calculating all distances
-     * using this as the earth radius
+     * using this as the earth radius.
      *
-     * @var integer
+     * @var int
      */
-    protected $earthRadius = OOW_EARTH_AVERAGE_RADIUS ;
+    protected $earthRadius = OOW_EARTH_AVERAGE_RADIUS;
 
     /**
-     * Setting the vehicle coordinates
+     * Setting the vehicle coordinates.
      *
      * @param VehicleCoordinate[] $coordinates
      *
@@ -66,7 +64,7 @@ class OutOfWay
     }
 
     /**
-     * Setting the actual coordinates received from a source
+     * Setting the actual coordinates received from a source.
      *
      * @param Coordinate[] $coordinates
      *
@@ -78,9 +76,9 @@ class OutOfWay
     }
 
     /**
-     * Setting the filteration
+     * Setting the filteration.
      *
-     * @param boolean $active
+     * @param bool $active
      *
      * @return void
      */
@@ -90,9 +88,9 @@ class OutOfWay
     }
 
     /**
-     * Return the weather tha filteration is on or not
+     * Return the weather tha filteration is on or not.
      *
-     * @return boolean
+     * @return bool
      */
     public function isFiltering()
     {
@@ -100,7 +98,7 @@ class OutOfWay
     }
 
     /**
-     * Maximum relative error that can be happened
+     * Maximum relative error that can be happened.
      *
      * @param float $err
      *
@@ -112,7 +110,7 @@ class OutOfWay
     }
 
     /**
-     * Returning the maximum relative error
+     * Returning the maximum relative error.
      *
      * @return float
      */
@@ -122,58 +120,59 @@ class OutOfWay
     }
 
     /**
-     * Filtering coordinates and removing error coordinates
-     * 
+     * Filtering coordinates and removing error coordinates.
+     *
      * @link https://medium.com/driving-to-the-future/map-matching-and-the-processing-of-raw-gps-data-on-an-industrial-scale-599a9475d332
      *
      * @return void
      */
     protected function filterCoordinates()
     {
-        $this->vehicleCoordinates = array_filter($this->vehicleCoordinates, function ( VehicleCoordinate $coordinate,$i) {
-            if($i==0)
+        $this->vehicleCoordinates = array_filter($this->vehicleCoordinates, function (VehicleCoordinate $coordinate, $i) {
+            if ($i == 0) {
                 return true;
+            }
 
             $gpsVelocity = $this->calculateDistance(
-                $this->vehicleCoordinates[$i-1]->getLatitude(),
-                $this->vehicleCoordinates[$i-1]->getLongitude(),
+                $this->vehicleCoordinates[$i - 1]->getLatitude(),
+                $this->vehicleCoordinates[$i - 1]->getLongitude(),
                 $coordinate->getLatitude(),
                 $coordinate->getLongitude(),
                 $this->earthRadius
-            )/(
-                ($this->vehicleCoordinates[$i-1]->getCurrentTime()
+            ) / (
+                ($this->vehicleCoordinates[$i - 1]->getCurrentTime()
                 -
-                $coordinate->getCurrentTime())/(1000*1000*60*60)
+                $coordinate->getCurrentTime()) / (1000 * 1000 * 60 * 60)
             );
 
             $vehicleVelocity = (
-                $this->vehicleCoordinates[$i-1]->getSpeed()
+                $this->vehicleCoordinates[$i - 1]->getSpeed()
                 +
                 $coordinate->getSpeed()
-            )/2;
+            ) / 2;
 
-            $relativeError = abs($gpsVelocity-$vehicleVelocity)/$vehicleVelocity;
+            $relativeError = abs($gpsVelocity - $vehicleVelocity) / $vehicleVelocity;
 
-            if($relativeError>$this->getError()){
+            if ($relativeError > $this->getError()) {
                 return false;
             }
 
             return true;
-            
         }, ARRAY_FILTER_USE_BOTH);
     }
 
     /**
-     * Calculates the distance of two coordinates
-     * 
+     * Calculates the distance of two coordinates.
+     *
      * @param Coordinate $coord1
      * @param Coordinate $coord2
-     * 
+     *
      * @return float Distance between points in [km]
      */
-    protected function calculateDistance($coord1, $coord2) {
+    protected function calculateDistance($coord1, $coord2)
+    {
         // convert from degrees to radians
-        
+
         $x1 = $coord1->getXCoordinate();
         $x2 = $coord2->getXCoordinate();
 
@@ -183,70 +182,69 @@ class OutOfWay
         $z1 = $coord1->getZCoordinate();
         $z2 = $coord2->getZCoordinate();
 
-        return sqrt( pow($x2-$x1,2) + pow($y2-$y1,2) + pow($z2 - $z1,2) );
+        return sqrt(pow($x2 - $x1, 2) + pow($y2 - $y1, 2) + pow($z2 - $z1, 2));
     }
-    
+
     /**
-    * Returning the matched position for two coordinates and vehicle coordinate
-    *
-    * @link https://math.stackexchange.com/a/3302374/686279
-    *
-    * @param Coordinate $coord1
-    * @param Coordinate $coord2
-    * @param VehicleCoordinate $vehicle
-    *
-    * @return Coordinate
-    */
-    protected function getVehiclePosition($coord1,$coord2,$vehicle){
-    	$x1 = $coord1->getXCoordinate();
-    	$x2 = $coord2->getXCoordinate();
-    	$x3 = $vehicle->getXCoordinate();
-    	
-    	$y1 = $coord1->getYCoordinate();
-    	$y2 = $coord2->getYCoordinate();
-    	$y3 = $vehicle->getYCoordinate();
-    	
-    	$z1 = $coord1->getZCoordinate();
-    	$z2 = $coord2->getZCoordinate();
+     * Returning the matched position for two coordinates and vehicle coordinate.
+     *
+     * @link https://math.stackexchange.com/a/3302374/686279
+     *
+     * @param Coordinate        $coord1
+     * @param Coordinate        $coord2
+     * @param VehicleCoordinate $vehicle
+     *
+     * @return Coordinate
+     */
+    protected function getVehiclePosition($coord1, $coord2, $vehicle)
+    {
+        $x1 = $coord1->getXCoordinate();
+        $x2 = $coord2->getXCoordinate();
+        $x3 = $vehicle->getXCoordinate();
+
+        $y1 = $coord1->getYCoordinate();
+        $y2 = $coord2->getYCoordinate();
+        $y3 = $vehicle->getYCoordinate();
+
+        $z1 = $coord1->getZCoordinate();
+        $z2 = $coord2->getZCoordinate();
         $z3 = $vehicle->getZCoordinate();
-        
-    	$coordinate = new Coordinate;
-        
-        $w = ( ($x1-$x2)*($x3-$x2) +($y1 - $y2)*($y3 - $y2) + ($z1 - $z2)*($z3 - $z2) )/( pow($x1- $x2,2) + pow($y1 - $y2,2) + pow($z1 - $z2,2) );
 
-        $x = $w * $x1 + (1-$w)*$x2;
-        $y = $w * $y1 + (1-$w)*$y2;
-        $z = $w * $z1 + (1-$w)*$z2;
-	
-        $coordinate->setCoordinates($x,$y,$z);
-    	
-    	return $coordinate;
-    	
+        $coordinate = new Coordinate();
+
+        $w = (($x1 - $x2) * ($x3 - $x2) + ($y1 - $y2) * ($y3 - $y2) + ($z1 - $z2) * ($z3 - $z2)) / (pow($x1 - $x2, 2) + pow($y1 - $y2, 2) + pow($z1 - $z2, 2));
+
+        $x = $w * $x1 + (1 - $w) * $x2;
+        $y = $w * $y1 + (1 - $w) * $y2;
+        $z = $w * $z1 + (1 - $w) * $z2;
+
+        $coordinate->setCoordinates($x, $y, $z);
+
+        return $coordinate;
     }
 
     /**
-    * Executing the GPS data
-    *
-    * @return Coordinate[]]
-    */
-    public function getMatchedCoordinates(){
-    	
-    	if($this->enableFilteration){
-    		$this->filterCoordinates();
-    	}
+     * Executing the GPS data.
+     *
+     * @return Coordinate[]]
+     */
+    public function getMatchedCoordinates()
+    {
+        if ($this->enableFilteration) {
+            $this->filterCoordinates();
+        }
 
-    	$vehicle = $this->vehicleCoordinates;
-    	$actual = $this->actualCoordinates;
-    	$matched=[];
-    	
-    	
-    	foreach($vehicle as $vehicleCoordinate){
-    		usort($actual, function(Coordinate $actual1,Coordinate $actual2)use($vehicleCoordinate){
-    			$d1 = $this->calculateDistance(
+        $vehicle = $this->vehicleCoordinates;
+        $actual = $this->actualCoordinates;
+        $matched = [];
+
+        foreach ($vehicle as $vehicleCoordinate) {
+            usort($actual, function (Coordinate $actual1, Coordinate $actual2) use ($vehicleCoordinate) {
+                $d1 = $this->calculateDistance(
                     $vehicleCoordinate,
                     $actual1
                 );
-                
+
                 $d2 = $this->calculateDistance(
                     $vehicleCoordinate,
                     $actual2
@@ -255,23 +253,20 @@ class OutOfWay
                 if ($d1 == $d2) {
                     return 0;
                 }
+
                 return ($d1 < $d2) ? -1 : 1;
             });
-            
-    		$first=$actual[0];
-    		$second=$actual[1];
-            
-            \xdebug_break();
-            
-            $position = $this->getVehiclePosition($first,$second,$vehicleCoordinate);
 
-            $matched[]= $position;
-    	}
-    	
-    	return $matched;
+            $first = $actual[0];
+            $second = $actual[1];
+
+            \xdebug_break();
+
+            $position = $this->getVehiclePosition($first, $second, $vehicleCoordinate);
+
+            $matched[] = $position;
+        }
+
+        return $matched;
     }
 }
-    
-    
-    
-    

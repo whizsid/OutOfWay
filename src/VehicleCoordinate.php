@@ -1,7 +1,9 @@
 <?php
+
 namespace WhizSid\OutOfWay;
 
-class VehicleCoordinate extends Coordinate {
+class VehicleCoordinate extends Coordinate
+{
     /**
      * Vehicles speed on current coordinate. This
      * parameter is required if filterCoordinates
@@ -19,42 +21,46 @@ class VehicleCoordinate extends Coordinate {
     protected $time;
 
     /**
-     * Setting up the speed
+     * Setting up the speed.
      *
      * @param float $speed
-     * 
+     *
      * @return void
      */
-    public function setSpeed($speed){
+    public function setSpeed($speed)
+    {
         $this->speed = $speed;
     }
 
     /**
-     * Returning the speed in current coordinate
+     * Returning the speed in current coordinate.
      *
      * @return float
      */
-    public function getSpeed(){
+    public function getSpeed()
+    {
         return $this->speed;
     }
 
     /**
-     * Setting the current time
+     * Setting the current time.
      *
      * @param int $time in micro seconds
-     * 
+     *
      * @return void
      */
-    public function setCurrentTime($time){
+    public function setCurrentTime($time)
+    {
         $this->time = $time;
     }
 
     /**
-     * Returning the current time
+     * Returning the current time.
      *
      * @return int
      */
-    public function getCurrentTime(){
+    public function getCurrentTime()
+    {
         return $this->time;
     }
 }
