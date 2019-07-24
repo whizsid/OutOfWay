@@ -1,7 +1,10 @@
 {
     "name": "whizsid/outofway",
-    "description": "A Map Matching Library",
+    "description": "Map matching library working for all places.",
     "type": "library",
+    "keywords": [
+        "GPS","map","matching","php","coordinate","3d"
+    ],
     "license": "MIT",
     "authors": [
         {
@@ -18,5 +21,6 @@
         "files": [
             "src/constants.php"
         ]
-    }
+    },
+	"version":"1.0.0"
 }

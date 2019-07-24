@@ -6,6 +6,12 @@ use WhizSid\OutOfWay\VehicleCoordinate;
 
 class OutOfWay
 {
+    /**
+     * Helper for the out of way
+     *
+     * @var Helper
+     */
+    public static $helper = Helper::class;
 
     /**
      * Array of coordinates received from the vehicle
@@ -29,7 +35,7 @@ class OutOfWay
      *
      * @var bool
      */
-    protected $enableFilteration = true;
+    protected $enableFilteration = false;
 
     /**
      * Minimum relative error. Coordinates with relative error
@@ -158,39 +164,32 @@ class OutOfWay
     }
 
     /**
-     * Calculates the great-circle distance between two points, with
-     * the Vincenty formula.
+     * Calculates the distance of two coordinates
      * 
-     * @link https://stackoverflow.com/a/10054282/5498631
+     * @param Coordinate $coord1
+     * @param Coordinate $coord2
      * 
-     * @param float $latitudeFrom Latitude of start point in [deg decimal]
-     * @param float $longitudeFrom Longitude of start point in [deg decimal]
-     * @param float $latitudeTo Latitude of target point in [deg decimal]
-     * @param float $longitudeTo Longitude of target point in [deg decimal]
-     * @param float $earthRadius Mean earth radius in [km]
-     * 
-     * @return float Distance between points in [km] (same as earthRadius)
+     * @return float Distance between points in [km]
      */
-    protected function calculateDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = OOW_EARTH_AVERAGE_RADIUS) {
+    protected function calculateDistance($coord1, $coord2) {
         // convert from degrees to radians
-        $latFrom = deg2rad($latitudeFrom);
-        $lonFrom = deg2rad($longitudeFrom);
-        $latTo = deg2rad($latitudeTo);
-        $lonTo = deg2rad($longitudeTo);
+        
+        $x1 = $coord1->getXCoordinate();
+        $x2 = $coord2->getXCoordinate();
 
-        $lonDelta = $lonTo - $lonFrom;
-        $a = pow(cos($latTo) * sin($lonDelta), 2) +
-        pow(cos($latFrom) * sin($latTo) - sin($latFrom) * cos($latTo) * cos($lonDelta), 2);
-        $b = sin($latFrom) * sin($latTo) + cos($latFrom) * cos($latTo) * cos($lonDelta);
+        $y1 = $coord1->getYCoordinate();
+        $y2 = $coord2->getYCoordinate();
 
-        $angle = atan2(sqrt($a), $b);
-        return $angle * $earthRadius;
+        $z1 = $coord1->getZCoordinate();
+        $z2 = $coord2->getZCoordinate();
+
+        return sqrt( pow($x2-$x1,2) + pow($y2-$y1,2) + pow($z2 - $z1,2) );
     }
     
     /**
-    * Returning the matched position for twor coordinates and vehicle coordinate
+    * Returning the matched position for two coordinates and vehicle coordinate
     *
-    * @link https://www.researchgate.net/publication/48353309_A_General_Map_Matching_Algorithm_for_Transport_Telematics_Applications
+    * @link https://math.stackexchange.com/a/3302374/686279
     *
     * @param Coordinate $coord1
     * @param Coordinate $coord2
@@ -212,16 +211,14 @@ class OutOfWay
         $z3 = $vehicle->getZCoordinate();
         
     	$coordinate = new Coordinate;
-    	
-        $numerator = ( pow($x2- $x1,2) + pow($y2-$y1,2) );
-    	
-    	$x= ( ($x2-$x1) * ( $x3*($x2-$x1) + $y3*($y2-$y1) ) + ($y2-$y1) * ($x1*$y2-$x2*$y1) )/ $numerator;
-    		
-    	$y = ( ($y2-$y1) * ( $x3*($x2-$x1) + $y3*($y2-$y1) ) - ($x2-$x1) * ($x1*$y2-$x2*$y1) )/ $numerator;
-    	
-    	$z= ( ($z2-$z1) * ( $z3*($z2-$z1) + $y3*($y2-$y1) ) + ($y2-$y1) * ($z1*$y2-$z2*$y1) )/ ( pow($z2- $z1,2) + pow($y2-$y1,2) );
+        
+        $w = ( ($x1-$x2)*($x3-$x2) +($y1 - $y2)*($y3 - $y2) + ($z1 - $z2)*($z3 - $z2) )/( pow($x1- $x2,2) + pow($y1 - $y2,2) + pow($z1 - $z2,2) );
+
+        $x = $w * $x1 + (1-$w)*$x2;
+        $y = $w * $y1 + (1-$w)*$y2;
+        $z = $w * $z1 + (1-$w)*$z2;
 	
-    	$coordinate->setCoordinates($x,$y,$z);
+        $coordinate->setCoordinates($x,$y,$z);
     	
     	return $coordinate;
     	
@@ -244,18 +241,28 @@ class OutOfWay
     	
     	
     	foreach($vehicle as $vehicleCoordinate){
-    		uasort($actual, function(Coordinate $actual)use($vehicleCoordinate){
-    			return $this->calculateDistance(
-    				$vehicleCoordinate->getLatitude(),
-    				$vehicleCoordinate->getLongitude(),
-    				$actual->getLatitude(),
-    				$actual->getLongitude()
-    			);
+    		usort($actual, function(Coordinate $actual1,Coordinate $actual2)use($vehicleCoordinate){
+    			$d1 = $this->calculateDistance(
+                    $vehicleCoordinate,
+                    $actual1
+                );
+                
+                $d2 = $this->calculateDistance(
+                    $vehicleCoordinate,
+                    $actual2
+                );
+
+                if ($d1 == $d2) {
+                    return 0;
+                }
+                return ($d1 < $d2) ? -1 : 1;
             });
             
     		$first=$actual[0];
     		$second=$actual[1];
-    		
+            
+            \xdebug_break();
+            
             $position = $this->getVehiclePosition($first,$second,$vehicleCoordinate);
 
             $matched[]= $position;

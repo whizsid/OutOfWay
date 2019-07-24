@@ -19,6 +19,13 @@ class Coordinate implements JsonSerializable {
      */
     protected $longitude;
 
+    /**
+     * Id for the given coordinate
+     *
+     * @var mixed
+     */
+    protected $id;
+
     public function __construct($lat=null,$lng=null)
     {
         if(isset($lat))
@@ -137,6 +144,28 @@ class Coordinate implements JsonSerializable {
         
         $this->latitude = rad2deg(atan($z*sin(deg2rad($this->longitude))/((1-pow($this->getValueOfSquareEccentricity(),2))*$y)));
                 
+    }
+
+    /**
+     * Setting a ID for easy identication
+     *
+     * @param mixed $id
+     * 
+     * @return void
+     */
+    public function setId($id){
+        $this->id = $id;
+    }
+
+    /**
+     * Returning the ID
+     * 
+     * @return mixed
+     *
+     * @return void
+     */
+    public function getId(){
+
     }
 
     public function jsonSerialize()

@@ -2,28 +2,14 @@
 require_once '../vendor/autoload.php';
 
 use WhizSid\OutOfWay\OutOfWay;
-use WhizSid\OutOfWay\VehicleCoordinate;
 
 $passed = json_decode(file_get_contents('passed.json'), true);
 $vehicle = json_decode(file_get_contents('vehicle.json'), true);
 
 $outOfWay = new OutOfWay;
 
-$outOfWay->setFilteration(false);
-
-$formatedVehicle = [];
-$formatedPassed = [];
-
-foreach ($vehicle as $vehicleCoordinate) {
-    $formatedVehicle[] = new VehicleCoordinate($vehicleCoordinate['lat'], $vehicleCoordinate['lng']);
-}
-
-foreach ($passed as $passedCoordinate) {
-    $formatedPassed[] = new VehicleCoordinate($passedCoordinate['lat'], $passedCoordinate['lng']);
-}
-// \xdebug_break();
-$outOfWay->setActualCoordinates($formatedPassed);
-$outOfWay->setVehicleCoordinates($formatedVehicle);
+$outOfWay->setActualCoordinates($outOfWay::$helper::parseCoordinates($passed));
+$outOfWay->setVehicleCoordinates($outOfWay::$helper::parseCoordinates($vehicle));
 
 $contents = json_encode($outOfWay->getMatchedCoordinates());
 
@@ -35,7 +21,7 @@ file_put_contents('returned.json', $contents);
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>Simple Polylines</title>
+    <title>OutOfWay Demo</title>
     <script
         src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -82,20 +68,16 @@ file_put_contents('returned.json', $contents);
   <body>
     <div id="map"></div>
     <div id="description">
-        <span class="color red"></span> Actual Road  <span class="color green"></span> Vehicle Path <span class="color blue" ></span> Calculated Path
+        <span class="color blue"></span> Actual Road  <span class="color green"></span> Matched Coordinates <span class="color red" ></span> Real Coordinates
     </div>
     <script>
-
-      // This example creates a 2-pixel-wide red polyline showing the path of
-      // the first trans-Pacific flight between Oakland, CA, and Brisbane,
-      // Australia which was made by Charles Kingsford Smith.
 
       function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 12,
           center: {
-                "lat":6.92621,
-                "lng":80.21887
+                "lat":6.88020,
+                "lng":80.24290
             },
           mapTypeId: 'terrain'
         });
@@ -109,7 +91,7 @@ file_put_contents('returned.json', $contents);
                 var passedPath = new google.maps.Polyline({
                     path: data,
                     geodesic: true,
-                    strokeColor: '#FF0000',
+                    strokeColor: '#0000BB',
                     strokeOpacity: 1.0,
                     strokeWeight: 2
                 });
@@ -121,30 +103,30 @@ file_put_contents('returned.json', $contents);
                     dataType:'json',
                     url:'/vehicle.json',
                     success:function(vehicleData){
-                        var vehiclePath = new google.maps.Polyline({
-                            path: vehicleData,
-                            geodesic: true,
-                            strokeColor: '#00FF00',
-                            strokeOpacity: 1.0,
-                            strokeWeight: 2
-                        });
 
-                        vehiclePath.setMap(map);
+                        vehicleData.forEach((data,key) => {
+                          var marker = new google.maps.Marker({
+                            position: data,
+                            map: map,
+                            icon:'https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=' + key +'|FF0000|000000',
+                            title: 'Vehicle Position'
+                          });
+                        });
 
                         $.ajax({
                             method:'POST',
                             dataType:'json',
                             url:'/returned.json',
                             success:function(returnData){
-                                var returnedPath = new google.maps.Polyline({
-                                    path: returnData,
-                                    geodesic: true,
-                                    strokeColor: '#0000FF',
-                                    strokeOpacity: 1.0,
-                                    strokeWeight: 2
+                                
+                              returnData.forEach((data,key) => {
+                                var marker = new google.maps.Marker({
+                                  position: data,
+                                  icon:'https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=' + key +'|00FF00|000000',
+                                  map: map,
+                                  title: 'Calculated Position'
                                 });
-
-                                returnedPath.setMap(map);
+                              });
                             }
                         })
                     }
