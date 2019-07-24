@@ -6,7 +6,7 @@ use WhizSid\OutOfWay\OutOfWay;
 $passed = json_decode(file_get_contents('passed.json'), true);
 $vehicle = json_decode(file_get_contents('vehicle.json'), true);
 
-$outOfWay = new OutOfWay;
+$outOfWay = new OutOfWay();
 
 $outOfWay->setActualCoordinates($outOfWay::$helper::parseCoordinates($passed));
 $outOfWay->setVehicleCoordinates($outOfWay::$helper::parseCoordinates($vehicle));
