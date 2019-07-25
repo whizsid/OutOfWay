@@ -63,8 +63,13 @@ git clone https://github.com/whizsid/OutOfWay.git
 cd example
 
 ```
+3. Install depedencies.
 
-3. Run local serve in it and access from web browser.
+```
+composer install
+```
+
+4. Run local serve in it and access from web browser.
 
 ```
 php -S 127.0.0.1:8000
