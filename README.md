@@ -24,7 +24,7 @@ composer require whizsid/outofway
 
 ## Usage
 
-OutOfWay is easy to use. Only you want is call three methods.
+OutOfWay is easy to use. Only you want is call three methods. 
 
 ```
 // Creating new OutOfWay instance
@@ -40,6 +40,9 @@ $outOfWay->setVehicleCoordinates($outOfWay::$helper::parseCoordinates($vehicle))
 $outOfWay->getMatchedCoordinates();
 
 ```
+
+You want to pass a multidimentional array that containing `lat`,`lng` keys for each sub arrays to `Helper::parseCoordinates` method.
+
 
 This `getMatchedCoordinate()` method will return an array of `Coordinate` instances. You can use `getLatitude`,`getLongitude` methods to retrieve latitude and longitude from a `Coordinate`
 
