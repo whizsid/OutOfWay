@@ -260,8 +260,6 @@ class OutOfWay
             $first = $actual[0];
             $second = $actual[1];
 
-            \xdebug_break();
-
             $position = $this->getVehiclePosition($first, $second, $vehicleCoordinate);
 
             $matched[] = $position;
